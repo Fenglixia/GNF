@@ -137,8 +137,7 @@ def main():
     if opt.validation:
         logging.info('split validation')
         train_data, valid_data, train_global_graph, val_global_graph = split_validation(train_data, opt.valid_portion, train_global_graph)
-        test_data = pickle.load(open('dataset/' + opt.dataset + '/test.txt', 'rb'))
-        test_data = (test_data[0], test_data[1], test_global_graph, test_data[3])
+        test_data = (valid_data[0], valid_data[1], val_global_graph, valid_data[3])
         train_data = (train_data[0], train_data[1], train_global_graph, train_data[2])
     else:
         test_data = pickle.load(open('dataset/' + opt.dataset + '/test.txt', 'rb'))
