@@ -14,12 +14,12 @@ class LocalIntent(nn.Module):
 
         self.position_embedding = nn.Embedding(200, self.hidden_dim)
         self.w1 = nn.Parameter(torch.Tensor(self.hidden_dim * 2, self.hidden_dim))
-        self.w2 = nn.Parameter(torch.Tensor(self.hidden_dim, self.hidden_dim))
-        self.w3 = nn.Parameter(torch.Tensor(self.hidden_dim, self.hidden_dim))
-        self.w4 = nn.Parameter(torch.Tensor(self.hidden_dim, self.hidden_dim))
+        # self.w2 = nn.Parameter(torch.Tensor(self.hidden_dim, self.hidden_dim))
+        # self.w3 = nn.Parameter(torch.Tensor(self.hidden_dim, self.hidden_dim))
+        # self.w4 = nn.Parameter(torch.Tensor(self.hidden_dim, self.hidden_dim))
         self.q = nn.Parameter(torch.Tensor(self.hidden_dim, 1))
         self.bias = nn.Parameter(torch.Tensor(self.hidden_dim))
-        self.bias2 = nn.Parameter(torch.Tensor(self.hidden_dim))
+        # self.bias2 = nn.Parameter(torch.Tensor(self.hidden_dim))
         self.leaky_relu = nn.LeakyReLU(alpha)
 
     def forward(self, hidden, input_mask, path):
@@ -27,12 +27,12 @@ class LocalIntent(nn.Module):
         batch_size = h.shape[0]
         pos_emb = self.position_embedding.weight[:hidden.shape[1]]
         pos_emb = pos_emb.unsqueeze(0).repeat(batch_size, 1, 1)
-        s_m = torch.sum(torch.softmax(path, -1).unsqueeze(-1).repeat(1, 1, self.hidden_dim) * hidden, 1)
-        s_m = torch.matmul(s_m.unsqueeze(1).repeat(1, hidden.shape[1], 1), self.w2)  #
+        # s_m = torch.sum(torch.softmax(path, -1).unsqueeze(-1).repeat(1, 1, self.hidden_dim) * hidden, 1)
+        # s_m = torch.matmul(s_m.unsqueeze(1).repeat(1, hidden.shape[1], 1), self.w2)  #
         t = self.leaky_relu(torch.matmul(torch.cat([pos_emb, hidden], -1), self.w1) + self.bias)
-        h_n = t[:, 0]
-        h_n = h_n.unsqueeze(-2).repeat(1, hidden.shape[1], 1)
-        t = self.leaky_relu(torch.matmul(t, self.w3) + torch.matmul(h_n, self.w4) + s_m + self.bias2)
+        # h_n = t[:, 0]
+        # h_n = h_n.unsqueeze(-2).repeat(1, hidden.shape[1], 1)
+        # t = self.leaky_relu(torch.matmul(t, self.w3) + torch.matmul(h_n, self.w4) + s_m + self.bias2)
         t = F.dropout(t, self.dropout_p, training=self.training)
         t = torch.matmul(t, self.q).squeeze(-1)
         mask = -9e15 * torch.ones_like(t)
